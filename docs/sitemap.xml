@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>/404.html</loc>
+  </url>
+  <url>
+    <loc>/authors.html</loc>
+  </url>
+  <url>
+    <loc>/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/approx.balance.html</loc>
+  </url>
+  <url>
+    <loc>/reference/elnet.ate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ipw.ate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/naive.ate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/residualBalance.ate.html</loc>
+  </url>
+  <url>
+    <loc>/reference/residualBalance.mean.html</loc>
+  </url>
+  <url>
+    <loc>/reference/twostep.lasso.ate.html</loc>
+  </url>
+</urlset>

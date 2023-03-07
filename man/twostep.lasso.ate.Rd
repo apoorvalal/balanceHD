@@ -4,8 +4,14 @@
 \alias{twostep.lasso.ate}
 \title{Refit lasso correction for confounding variables}
 \usage{
-twostep.lasso.ate(X, Y, W, target.pop = c(0, 1), fit.propensity = TRUE,
-  estimate.se = FALSE)
+twostep.lasso.ate(
+  X,
+  Y,
+  W,
+  target.pop = c(0, 1),
+  fit.propensity = TRUE,
+  estimate.se = FALSE
+)
 }
 \arguments{
 \item{X}{the input features}

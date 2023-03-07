@@ -4,11 +4,21 @@
 \alias{residualBalance.ate}
 \title{Estimate ATE via approximate residual balancing}
 \usage{
-residualBalance.ate(X, Y, W, target.pop = c(0, 1),
-  allow.negative.weights = FALSE, zeta = 0.5, fit.method = c("elnet",
-  "none"), alpha = 0.9, scale.X = TRUE, estimate.se = FALSE,
+residualBalance.ate(
+  X,
+  Y,
+  W,
+  target.pop = c(0, 1),
+  allow.negative.weights = FALSE,
+  zeta = 0.5,
+  fit.method = c("elnet", "none"),
+  alpha = 0.9,
+  scale.X = TRUE,
+  estimate.se = FALSE,
   optimizer = c("mosek", "pogs", "pogs.dual", "quadprog"),
-  bound.gamma = FALSE, verbose = FALSE)
+  bound.gamma = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{X}{the input features}

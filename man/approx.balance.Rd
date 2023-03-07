@@ -4,9 +4,16 @@
 \alias{approx.balance}
 \title{Compute approximately balancing weights}
 \usage{
-approx.balance(M, balance.target, zeta = 0.5,
-  allow.negative.weights = FALSE, optimizer = c("mosek", "pogs",
-  "pogs.dual", "quadprog"), bound.gamma = FALSE, verbose = FALSE)
+approx.balance(
+  M,
+  balance.target,
+  zeta = 0.5,
+  allow.negative.weights = FALSE,
+  optimizer = c("mosek", "pogs", "pogs.dual", "quadprog"),
+  bound.gamma = FALSE,
+  gamma.max = 1/nrow(M)^(2/3),
+  verbose = FALSE
+)
 }
 \arguments{
 \item{M}{the feature matrix, see (*)}
@@ -24,6 +31,8 @@ must be installed separately. Quadprog is the default
 R solver.}
 
 \item{bound.gamma}{whether upper bound on gamma should be imposed}
+
+\item{gamma.max}{specific upper bound for gamma (ignored if bound.gamma = FALSE)}
 
 \item{verbose}{whether the optimizer should print progress information}
 }

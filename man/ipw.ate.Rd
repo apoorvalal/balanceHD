@@ -4,11 +4,20 @@
 \alias{ipw.ate}
 \title{Estimate ATE via inverse propensity weighting}
 \usage{
-ipw.ate(X, Y, W, target.pop = c(0, 1), eps.threshold = 1/20,
-  fit.method = c("elnet", "none"), alpha.fit = 0.9,
-  prop.method = c("elnet", "randomforest"), alpha.prop = 0.5,
-  prop.weighted.fit = FALSE, targeting.method = c("AIPW", "TMLE"),
-  estimate.se = FALSE)
+ipw.ate(
+  X,
+  Y,
+  W,
+  target.pop = c(0, 1),
+  eps.threshold = 1/20,
+  fit.method = c("elnet", "none"),
+  alpha.fit = 0.9,
+  prop.method = c("elnet", "randomforest"),
+  alpha.prop = 0.5,
+  prop.weighted.fit = FALSE,
+  targeting.method = c("AIPW", "TMLE"),
+  estimate.se = FALSE
+)
 }
 \arguments{
 \item{X}{the input features}

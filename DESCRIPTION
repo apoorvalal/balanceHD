@@ -9,6 +9,6 @@ Imports: glmnet,
     Matrix
 Suggests: Rmosek,
     pogs,
-    randomForest,
+    grf,
     testthat
-RoxygenNote: 6.0.1
+RoxygenNote: 7.2.3

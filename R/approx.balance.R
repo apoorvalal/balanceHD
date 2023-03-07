@@ -25,9 +25,8 @@ approx.balance = function(M,
                           allow.negative.weights = FALSE,
                           optimizer = c("mosek", "pogs", "pogs.dual", "quadprog"),
                           bound.gamma = FALSE,
-                          gamma.max = 1/nrow(M)^(2/3),
+                          gamma.max = 1 / nrow(M)^(2 / 3),
                           verbose = FALSE) {
-
   if (zeta <= 0 || zeta >= 1) {
     stop("approx.balance: zeta must be between 0 and 1")
   }
@@ -53,7 +52,9 @@ approx.balance = function(M,
       if (optimizer == "pogs") {
         gamma = approx.balance.pogs(M, balance.target, zeta, allow.negative.weights, bound.gamma, gamma.max, verbose)
       } else {
-        if (bound.gamma) {warning("bound.gamma = TRUE not implemented for this optimizer")}
+        if (bound.gamma) {
+          warning("bound.gamma = TRUE not implemented for this optimizer")
+        }
         gamma = approx.balance.pogs.dual(M, balance.target, zeta, allow.negative.weights, verbose)
       }
     } else {
@@ -63,7 +64,9 @@ approx.balance = function(M,
   }
 
   if (optimizer == "quadprog") {
-    if (bound.gamma) {warning("bound.gamma = TRUE not implemented for this optimizer")}
+    if (bound.gamma) {
+      warning("bound.gamma = TRUE not implemented for this optimizer")
+    }
     gamma = approx.balance.quadprog(M, balance.target, zeta, allow.negative.weights)
   }
 
@@ -89,12 +92,13 @@ approx.balance.quadprog = function(M,
   dvec = rep(0, 1 + nrow(M))
   Amat = cbind(
     c(0, rep(1, nrow(M))),
-    rbind(rep(1, ncol(M)), M ),
-    rbind(rep(1, ncol(M)), -M))
+    rbind(rep(1, ncol(M)), M),
+    rbind(rep(1, ncol(M)), -M)
+  )
   bvec = c(1, balance.target, -balance.target)
 
   if (!allow.negative.weights) {
-    LB = 1/nrow(M)/10000
+    LB = 1 / nrow(M) / 10000
     Amat = cbind(Amat, rbind(rep(0, nrow(M)), diag(rep(1, nrow(M)))))
     bvec = c(bvec, rep(LB, nrow(M)))
   }
@@ -110,9 +114,8 @@ approx.balance.mosek.dual = function(M,
                                      zeta = 0.5,
                                      allow.negative.weights = FALSE,
                                      bound.gamma = FALSE,
-                                     gamma.max = 1/nrow(M)^(2/3),
+                                     gamma.max = 1 / nrow(M)^(2 / 3),
                                      verbose = FALSE) {
-
   # The primal problem is:
   # Minimize 1/2 x' diag(qvec) x
   # subject to Ax <= b,
@@ -128,12 +131,12 @@ approx.balance.mosek.dual = function(M,
     matrix(c(0, rep(1, nrow(M))), 1, nvar),
     cbind(rep(-1, ncol(M)), tM),
     cbind(rep(-1, ncol(M)), -tM),
-    if(!allow.negative.weights) {
+    if (!allow.negative.weights) {
       cbind(0, Matrix::diag(-1, nrow(M), nrow(M)))
     } else {
       numeric()
     },
-    if(bound.gamma) {
+    if (bound.gamma) {
       cbind(0, Matrix::diag(1, nrow(M), nrow(M)))
     } else {
       numeric()
@@ -141,42 +144,46 @@ approx.balance.mosek.dual = function(M,
   )
   A.primal = Reduce(rbind, A.primal.list)
 
-  bvec = c(1,
-           balance.target,
-           -balance.target,
-           if(!allow.negative.weights) {
-             rep(0, nrow(M))
-           } else {
-             numeric()
-           },
-           if (bound.gamma) {
-             rep(gamma.max, nrow(M))
-           } else {
-             numeric()
-           })
+  bvec = c(
+    1,
+    balance.target,
+    -balance.target,
+    if (!allow.negative.weights) {
+      rep(0, nrow(M))
+    } else {
+      numeric()
+    },
+    if (bound.gamma) {
+      rep(gamma.max, nrow(M))
+    } else {
+      numeric()
+    }
+  )
 
-  equality.primal = c(TRUE, rep(FALSE, 2*ncol(M) + (as.numeric(!allow.negative.weights) + as.numeric(bound.gamma)) * nrow(M)))
+  equality.primal = c(TRUE, rep(FALSE, 2 * ncol(M) + (as.numeric(!allow.negative.weights) + as.numeric(bound.gamma)) * nrow(M)))
 
   # The dual problem is then
   # Minimize 1/2 lambda A diag(1/qvec) A' lambda + b * lambda
   # Subject to lambda >= 0 for the lambdas corresponding to inequality constraints
 
-  #A.dual = diag(1/sqrt(qvec.primal)) %*% t(A.primal)
-  A.dual = 1/sqrt(qvec.primal) * Matrix::t(A.primal) #this is the same thing, but faster
+  # A.dual = diag(1/sqrt(qvec.primal)) %*% t(A.primal)
+  A.dual = 1 / sqrt(qvec.primal) * Matrix::t(A.primal) # this is the same thing, but faster
 
   # Next we turn this into a conic program:
   # Minimize t
   # Subject to bvec * lambda + q - t = 0
-  #	A.dual * lambda - mu = 0
-  #	lambda >= 0 (for the inequality constraints)
-  #	2 * q >= ||mu||_2^2
+  # 	A.dual * lambda - mu = 0
+  # 	lambda >= 0 (for the inequality constraints)
+  # 	2 * q >= ||mu||_2^2
   # Where we note that the last constraint is a rotated cone.
   #
   # Below, the solution vector is (lambda, mu, q, t, ONE), where ONE
   # is just a variable constrained to be 1.
-  A.conic = rbind(c(bvec, rep(0, nvar), 1, -1, 0),
-                          cbind(A.dual, Matrix::diag(-1, nvar, nvar), 0, 0, 0),
-                          c(rep(0, length(bvec) + nvar + 2), 1))
+  A.conic = rbind(
+    c(bvec, rep(0, nvar), 1, -1, 0),
+    cbind(A.dual, Matrix::diag(-1, nvar, nvar), 0, 0, 0),
+    c(rep(0, length(bvec) + nvar + 2), 1)
+  )
   rhs.conic = c(rep(0, 1 + nvar), 1)
 
   blx.conic = rep(-Inf, ncol(A.conic))
@@ -196,13 +203,13 @@ approx.balance.mosek.dual = function(M,
   if (verbose) {
     mosek.out = Rmosek::mosek(mosek.problem)
   } else {
-    mosek.out = Rmosek::mosek(mosek.problem, opts=list(verbose=0))
+    mosek.out = Rmosek::mosek(mosek.problem, opts = list(verbose = 0))
   }
 
-  primal = -1/qvec.primal * (t(A.primal) %*% mosek.out$sol$itr$xx[1:nrow(A.primal)])
+  primal = -1 / qvec.primal * (t(A.primal) %*% mosek.out$sol$itr$xx[1:nrow(A.primal)])
   delta = primal[1]
   gamma = primal[1 + 1:nrow(M)]
-  gamma/sum(gamma)
+  gamma / sum(gamma)
 }
 
 
@@ -212,9 +219,8 @@ approx.balance.pogs = function(M,
                                zeta = 0.5,
                                allow.negative.weights = FALSE,
                                bound.gamma = FALSE,
-                               gamma.max = 1/nrow(M)^(2/3),
+                               gamma.max = 1 / nrow(M)^(2 / 3),
                                verbose = FALSE) {
-
   # Our original problem is the following:
   #
   # Minimize ||gamma||_2^2 + delta^2 / lambda^2, subject to
@@ -235,12 +241,16 @@ approx.balance.pogs = function(M,
   lambda = sqrt((1 - zeta) / zeta)
   g = list(h = kSquare())
 
-  f = list(h = c(kIndLe0(2 * ncol(M)), kIndEq0(2)),
-           b = c(rep(0, 2 * ncol(M)), 1, 1))
-  A = rbind(cbind(t(M), -balance.target, -lambda),
-            cbind(-t(M), balance.target, -lambda),
-            c(rep(1, nrow(M)), 0, 0),
-            c(rep(0, nrow(M)), 1, 0))
+  f = list(
+    h = c(kIndLe0(2 * ncol(M)), kIndEq0(2)),
+    b = c(rep(0, 2 * ncol(M)), 1, 1)
+  )
+  A = rbind(
+    cbind(t(M), -balance.target, -lambda),
+    cbind(-t(M), balance.target, -lambda),
+    c(rep(1, nrow(M)), 0, 0),
+    c(rep(0, nrow(M)), 1, 0)
+  )
 
   if (!allow.negative.weights) {
     f$h = c(f$h, kIndLe0(nrow(M)))
@@ -254,10 +264,10 @@ approx.balance.pogs = function(M,
     A = rbind(A, cbind(diag(1, nrow(M)), -gamma.max, 0))
   }
 
-  pogs.solution = pogs(A, f, g, params = list(rel_tol=1e-4, abs_tol=1e-5, verbose=2*as.numeric(verbose)))
+  pogs.solution = pogs(A, f, g, params = list(rel_tol = 1e-4, abs_tol = 1e-5, verbose = 2 * as.numeric(verbose)))
 
   gamma = pogs.solution$x[1:nrow(M)]
-  gamma/sum(gamma)
+  gamma / sum(gamma)
 }
 
 # Find approximately balancing weights using pogs
@@ -266,7 +276,6 @@ approx.balance.pogs.dual = function(M,
                                     zeta = 0.5,
                                     allow.negative.weights = FALSE,
                                     verbose = FALSE) {
-
   # The primal problem is:
   # Minimize 1/2 x' diag(qvec) x
   # subject to Ax <= b,
@@ -276,10 +285,11 @@ approx.balance.pogs.dual = function(M,
   qvec.primal = 2 * c(zeta, rep(1 - zeta, nrow(M)))
   A.primal = rbind(
     c(0, rep(1, nrow(M))),
-    cbind(rep(-1, ncol(M)), t(M) ),
-    cbind(rep(-1, ncol(M)), -t(M)))
+    cbind(rep(-1, ncol(M)), t(M)),
+    cbind(rep(-1, ncol(M)), -t(M))
+  )
   b.primal = c(1, balance.target, -balance.target)
-  equality.primal = c(TRUE, rep(FALSE, 2*ncol(M)))
+  equality.primal = c(TRUE, rep(FALSE, 2 * ncol(M)))
 
   if (!allow.negative.weights) {
     A.primal = rbind(A.primal, cbind(0, diag(-1, nrow(M), nrow(M))))
@@ -297,15 +307,15 @@ approx.balance.pogs.dual = function(M,
   #  d = b * lambda
   #  lambda >= 0
 
-  A.pogs = rbind(diag(1/sqrt(qvec.primal)) %*% t(A.primal), b.primal)
+  A.pogs = rbind(diag(1 / sqrt(qvec.primal)) %*% t(A.primal), b.primal)
   f.pogs = list(h = c(kSquare(ncol(A.primal)), kIdentity(1)))
   g.pogs = list(h = kIndGe0(length(equality.primal)))
   g.pogs$h[equality.primal] = kZero(sum(equality.primal))
 
 
-  pogs.solution = pogs(A.pogs, f.pogs, g.pogs, params = list(rel_tol=1e-4, abs_tol=1e-5, verbose=2*as.numeric(verbose)))
+  pogs.solution = pogs(A.pogs, f.pogs, g.pogs, params = list(rel_tol = 1e-4, abs_tol = 1e-5, verbose = 2 * as.numeric(verbose)))
 
-  primal = -diag(1/sqrt(qvec.primal)) %*% t(A.primal) %*% pogs.solution$x
+  primal = -diag(1 / sqrt(qvec.primal)) %*% t(A.primal) %*% pogs.solution$x
   delta = primal[1]
   gamma = primal[1 + 1:nrow(M)]
   gamma / sum(gamma)

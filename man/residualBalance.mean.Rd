@@ -4,9 +4,18 @@
 \alias{residualBalance.mean}
 \title{Estimate mean outcome at balance.target via residual balancing}
 \usage{
-residualBalance.mean(XW, YW, balance.target, allow.negative.weights = FALSE,
-  zeta, fit.method = c("elnet", "none"), alpha, optimizer = c("mosek",
-  "pogs", "pogs.dual", "quadprog"), bound.gamma = FALSE, verbose = FALSE)
+residualBalance.mean(
+  XW,
+  YW,
+  balance.target,
+  allow.negative.weights = FALSE,
+  zeta,
+  fit.method = c("elnet", "none"),
+  alpha,
+  optimizer = c("mosek", "pogs", "pogs.dual", "quadprog"),
+  bound.gamma = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{XW}{the input features for the sub-population of interest}
